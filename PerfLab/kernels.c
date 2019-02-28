@@ -112,8 +112,8 @@ void rotate4(int dim, pixel *src, pixel *dst)
 	}
 }
 
-char rotate_descr[] = "rotate";
-void rotate(int dim, pixel *src, pixel *dst) 
+char rotate_descr5[] = "rotate5";
+void rotate5(int dim, pixel *src, pixel *dst) 
 {
     int i, j, k, h;
 	int block = 32;
@@ -127,6 +127,27 @@ void rotate(int dim, pixel *src, pixel *dst)
 				for(h = 0; h < block; h+=2){
 					dst[p_d + (block - k - 1) * dim + h]= src[p_s + h * dim + k];
 					dst[p_d + (block - k - 1) * dim + h + 1]= src[p_s + h * dim + k + dim];
+				}
+			}
+		}
+	}
+}
+
+char rotate_descr[] = "rotate";
+void rotate(int dim, pixel *src, pixel *dst) 
+{
+    int i, j, k, h;
+	int block = 32;
+	int para = dim - block;
+	pixel * p_d, *p_s;
+	for(i = 0; i < dim; i+=block){
+		for(j = 0; j < dim; j+=block){
+			p_d = dst + ((para - j) * dim + i);
+			p_s = src + i * dim + j;
+			for(k = 0; k < block; k++){
+				for(h = 0; h < block; h+=2){
+					*(p_d + (block - k - 1) * dim + h)= *(p_s + h * dim + k);
+					*(p_d + (block - k - 1) * dim + h + 1)= *(p_s + h * dim + k + dim);
 				}
 			}
 		}
@@ -146,6 +167,7 @@ void register_rotate_functions()
     add_rotate_function(&rotate1, rotate_descr1);   
 	add_rotate_function(&rotate2, rotate_descr2);   
 	add_rotate_function(&rotate4, rotate_descr4);  
+	add_rotate_function(&rotate5, rotate_descr5); 
 	add_rotate_function(&rotate, rotate_descr);  
     /* ... Register additional test functions here */
 }
