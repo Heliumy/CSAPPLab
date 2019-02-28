@@ -10,10 +10,10 @@
  * Please fill in the following team struct 
  */
 team_t team = {
-    "bovik",              /* Team name */
+    "gpzlx1",              /* Team name */
 
-    "Harry Q. Bovik",     /* First member full name */
-    "bovik@nowhere.edu",  /* First member email address */
+    "Gong",     /* First member full name */
+    "gpzlx1@mail.edu.cn",  /* First member email address */
 
     "",                   /* Second member full name (leave blank if none) */
     ""                    /* Second member email addr (leave blank if none) */
@@ -44,12 +44,94 @@ void naive_rotate(int dim, pixel *src, pixel *dst)
  * rotate - Your current working version of rotate
  * IMPORTANT: This is the version you will be graded on
  */
-char rotate_descr[] = "rotate: Current working version";
-void rotate(int dim, pixel *src, pixel *dst) 
+char rotate_descr1[] = "rotate1";
+void rotate1(int dim, pixel *src, pixel *dst) 
 {
-    naive_rotate(dim, src, dst);
+    int i, j;
+    for (i = 0; i < dim; i++){
+		for (j = 0; j < dim; j++)
+			dst[(dim - 1 - j) * dim + i] = src[i * dim + j]; 
+	}
 }
 
+
+char rotate_descr2[] = "rotate2";
+void rotate2(int dim, pixel *src, pixel *dst) 
+{
+    int i, j;
+	int k;
+    for (j = 0; j < dim; j++){ 
+		k = (dim - 1 - j) * dim;
+		for (i = 0; i < dim; i++)
+			dst[k + i] = src[i * dim + j]; //RIDX(i,j,n) ((i)*(n)+(j))
+	}
+}
+
+/*char rotate_descr3[] = "rotate3";
+void rotate3(int dim, pixel *src, pixel *dst) 
+{
+    int i, j;
+	int k;
+	int k2,k3,k1;
+	int dim1,dim2,dim3;
+    for (j = 0; j < dim; j++){ 
+		k = (dim - 1 - j) * dim;
+		k1 = k + 1;
+		k2 = k1 + 1;
+		k3 = k2 + 1;
+		dim1 = dim + j;
+		dim2 = dim1 + dim;
+		dim3 = dim2 + dim;
+		for (i = 0; i < dim; i+=4){
+			dst[k + i] = src[i * dim + j]; 
+			dst[k1 + i] = src[i * dim + dim1]; 
+			dst[k2 + i] = src[i * dim + dim2]; 
+			dst[k3 + i] = src[i * dim + dim3]; 
+		}
+	}
+}*/
+
+char rotate_descr4[] = "rotate4";
+void rotate4(int dim, pixel *src, pixel *dst) 
+{
+    int i, j, k, h;
+	int block = 32;
+	int b = dim / block;
+	int para = (b-1) * block;
+	int p_d, p_s;
+	for(i = 0; i < dim; i+=block){
+		for(j = 0; j < dim; j+=block){
+			p_d = (para - j) * dim + i;
+			p_s = i * dim + j;
+			for(k = 0; k < block; k++){
+				for(h = 0; h < block; h++){
+					dst[ p_d + (block - k - 1) * dim + h]= src[p_s + h * dim + k];
+				}
+			}
+		}
+	}
+}
+
+char rotate_descr[] = "rotate";
+void rotate(int dim, pixel *src, pixel *dst) 
+{
+    int i, j, k, h;
+	int block = 32;
+	int para = dim - block;
+	int p_d, p_s;
+	for(i = 0; i < dim; i+=block){
+		for(j = 0; j < dim; j+=block){
+			p_d = (para - j) * dim + i;
+			p_s = i * dim + j;
+			for(k = 0; k < block; k++){
+				for(h = 0; h < block; h+=2){
+					dst[p_d + (block - k - 1) * dim + h]= src[p_s + h * dim + k];
+					dst[p_d + (block - k - 1) * dim + h + 1]= src[p_s + h * dim + k + dim];
+				}
+			}
+		}
+	}
+}
 /*********************************************************************
  * register_rotate_functions - Register all of your different versions
  *     of the rotate kernel with the driver by calling the
@@ -61,7 +143,10 @@ void rotate(int dim, pixel *src, pixel *dst)
 void register_rotate_functions() 
 {
     add_rotate_function(&naive_rotate, naive_rotate_descr);   
-    add_rotate_function(&rotate, rotate_descr);   
+    add_rotate_function(&rotate1, rotate_descr1);   
+	add_rotate_function(&rotate2, rotate_descr2);   
+	add_rotate_function(&rotate4, rotate_descr4);  
+	add_rotate_function(&rotate, rotate_descr);  
     /* ... Register additional test functions here */
 }
 
