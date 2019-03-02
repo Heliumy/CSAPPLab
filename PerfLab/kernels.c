@@ -267,12 +267,214 @@ void naive_smooth(int dim, pixel *src, pixel *dst)
  * smooth - Your current working version of smooth. 
  * IMPORTANT: This is the version you will be graded on
  */
-char smooth_descr[] = "smooth: Current working version";
-void smooth(int dim, pixel *src, pixel *dst) 
-{
-    naive_smooth(dim, src, dst);
+ typedef struct {
+	 int red;
+	 int green;
+	 int blue;
+} p_sum;
+ 
+char smooth_descr1[] = "smooth1";
+void smooth1(int dim, pixel *src, pixel *dst){
+	int i, j;
+	int red,green,blue,num;
+	p_sum sum[512 * 512];
+	for(i = 0; i < dim; i++){
+		for(j = 0; j < dim; j++){
+			red = 0;
+			green = 0;
+			blue = 0;
+			for(int k = max(i-1, 0); k <= min(i+1, dim-1); k++){
+				red += (int)src[RIDX(k,j,dim)].red;
+				green += (int)src[RIDX(k,j,dim)].green;
+				blue += (int)src[RIDX(k,j,dim)].blue;
+			}
+				sum[RIDX(i, j, dim)].red = red;
+				sum[RIDX(i, j, dim)].green = green;
+				sum[RIDX(i, j, dim)].blue = blue;
+		}
+	}
+	
+	for(i = 0; i < dim; i++){
+		for(j = 0; j < dim; j++){
+			red = 0;
+			green = 0;
+			blue = 0;
+			for(int k = max(j-1, 0); k <= min(j+1, dim - 1); k++){
+				red += sum[RIDX(i, k, dim)].red;
+				green += sum[RIDX(i, k, dim)].green;
+				blue += sum[RIDX(i, k, dim)].blue;
+			}
+			
+			if((i == 0 || i == dim - 1) && (j == 0 || j == dim - 1))
+				num = 4;
+			else if( i == 0 || i == dim - 1 || j == 0 || j == dim - 1)
+				num = 6;
+			else	
+				num = 9;
+			
+			dst[RIDX(i, j, dim)].red = (unsigned short)(red/num);
+			dst[RIDX(i, j, dim)].green = (unsigned short)(green/num);
+			dst[RIDX(i, j, dim)].blue = (unsigned short)(blue/num);
+		}
+	}
+		
 }
 
+
+char smooth_descr[] = "smooth: Current working version";
+void smooth(int dim, pixel *src, pixel *dst){
+	int i, j;
+	int num;
+	pixel_sum sum[530 * 530];
+	
+
+		
+	for(j = 0; j < dim; j++){
+		sum[RIDX(0, j, dim)].red = src[RIDX(0, j, dim)].red + src[RIDX(1, j, dim)].red;
+		sum[RIDX(0, j, dim)].green = src[RIDX(0, j, dim)].green + src[RIDX(1, j, dim)].green;
+		sum[RIDX(0, j, dim)].blue = src[RIDX(0, j, dim)].blue + src[RIDX(1, j, dim)].blue;
+		sum[RIDX(0, j, dim)].num = 2;
+			
+			
+			
+		for(i = 1; i < dim - 1; i++){
+			sum[RIDX(i, j, dim)].red = src[RIDX(i-1, j, dim)].red + src[RIDX(i, j, dim)].red + src[RIDX(i+1, j, dim)].red;
+			sum[RIDX(i, j, dim)].green = src[RIDX(i-1, j, dim)].green + src[RIDX(i, j, dim)].green + src[RIDX(i+1, j, dim)].green;
+			sum[RIDX(i, j, dim)].blue = src[RIDX(i-1, j, dim)].blue + src[RIDX(i, j, dim)].blue + src[RIDX(i+1, j, dim)].blue;
+			sum[RIDX(i, j, dim)].num = 3;
+		}
+			
+		sum[RIDX(dim - 1, j, dim)].red = src[RIDX(dim - 2, j, dim)].red + src[RIDX(dim - 1, j, dim)].red;
+		sum[RIDX(dim - 1, j, dim)].green = src[RIDX(dim - 2, j, dim)].green + src[RIDX(dim - 1, j, dim)].green;
+		sum[RIDX(dim - 1, j, dim)].blue = src[RIDX(dim - 2, j, dim)].blue + src[RIDX(dim - 1, j, dim)].blue;
+		sum[RIDX(dim - 1, j, dim)].num = 2;
+
+	}
+	
+
+		
+	for(i = 0; i < dim; i++){
+ 		num = sum[RIDX(i, 0, dim)].num + sum[RIDX(i, 1, dim)].num;
+		dst[RIDX(i, 0, dim)].red = (unsigned short)((sum[RIDX(i, 0, dim)].red + sum[RIDX(i, 1, dim)].red)/num);
+		dst[RIDX(i, 0, dim)].green = (unsigned short)((sum[RIDX(i, 0, dim)].green + sum[RIDX(i, 1, dim)].green)/num);
+		dst[RIDX(i, 0, dim)].blue = (unsigned short)((sum[RIDX(i, 0, dim)].blue + sum[RIDX(i, 1, dim)].blue)/num);
+		
+		for(j = 1; j < dim-1; j++){
+			num = sum[RIDX(i, j-1, dim)].num + sum[RIDX(i, j, dim)].num+ sum[RIDX(i, j+1, dim)].num;
+			dst[RIDX(i, j, dim)].red = (unsigned short)((sum[RIDX(i, j-1, dim)].red + sum[RIDX(i, j, dim)].red + sum[RIDX(i, j+1, dim)].red)/num);
+			dst[RIDX(i, j, dim)].green = (unsigned short)((sum[RIDX(i, j-1, dim)].green + sum[RIDX(i, j, dim)].green + sum[RIDX(i, j+1, dim)].green)/num);
+			dst[RIDX(i, j, dim)].blue = (unsigned short)((sum[RIDX(i, j-1, dim)].blue + sum[RIDX(i, j, dim)].blue + sum[RIDX(i, j+1, dim)].blue)/num);
+			}
+						
+		num = sum[RIDX(i, dim-2, dim)].num + sum[RIDX(i, dim - 1, dim)].num;
+		dst[RIDX(i, dim - 1, dim)].red = (unsigned short)((sum[RIDX(i, dim-2, dim)].red + sum[RIDX(i, dim-1, dim)].red)/num);
+		dst[RIDX(i, dim - 1, dim)].green = (unsigned short)((sum[RIDX(i, dim-2, dim)].green + sum[RIDX(i, dim-1, dim)].green)/num) ;
+		dst[RIDX(i, dim - 1, dim)].blue = (unsigned short)((sum[RIDX(i, dim-2, dim)].blue + sum[RIDX(i, dim-1, dim)].blue)/num) ;
+	}
+				
+}
+
+
+char smooth_descr5[] = "smooth5";
+void smooth5(int dim, pixel *src, pixel *dst){
+	int i, j;
+	int num;
+	pixel_sum sum[541 * 541];
+	
+
+		
+	for(i = 0; i < dim; i++){
+		sum[RIDX(i, 0, dim)].red = src[RIDX(i, 0, dim)].red + src[RIDX(i, 1, dim)].red;
+		sum[RIDX(i, 0, dim)].green = src[RIDX(i, 0, dim)].green + src[RIDX(i, 1, dim)].green;
+		sum[RIDX(i, 0, dim)].blue = src[RIDX(i, 0, dim)].blue + src[RIDX(i, 1, dim)].blue;
+		sum[RIDX(i, 0, dim)].num = 2;
+			
+			
+			
+		for(j = 1; j < dim - 1; j++){
+			sum[RIDX(i, j, dim)].red = src[RIDX(i, j-1, dim)].red + src[RIDX(i, j, dim)].red + src[RIDX(i, j+1, dim)].red;
+			sum[RIDX(i, j, dim)].green = src[RIDX(i, j-1, dim)].green + src[RIDX(i, j, dim)].green + src[RIDX(i, j+1, dim)].green;
+			sum[RIDX(i, j, dim)].blue = src[RIDX(i, j-1, dim)].blue + src[RIDX(i, j, dim)].blue + src[RIDX(i, j+1, dim)].blue;
+			sum[RIDX(i, j, dim)].num = 3;
+		}
+			
+		sum[RIDX(i,  dim-1, dim)].red = src[RIDX(i,  dim-1, dim)].red + src[RIDX(i, dim-2, dim)].red;
+		sum[RIDX(i,  dim-1, dim)].green = src[RIDX(i,  dim-1, dim)].green + src[RIDX(i, dim-2, dim)].green;
+		sum[RIDX(i,  dim-1, dim)].blue = src[RIDX(i,  dim-1, dim)].blue + src[RIDX(i, dim-2, dim)].blue;
+		sum[RIDX(i,  dim-1, dim)].num = 2;
+
+	}
+	
+
+		
+	for(j = 0; j < dim; j++){
+ 		num = sum[RIDX(0, j, dim)].num + sum[RIDX(1, j, dim)].num;
+		dst[RIDX(0, j, dim)].red = (unsigned short)((sum[RIDX(0, j, dim)].red + sum[RIDX(1, j, dim)].red)/num);
+		dst[RIDX(0, j, dim)].green = (unsigned short)((sum[RIDX(0, j, dim)].green + sum[RIDX(1, j, dim)].green)/num);
+		dst[RIDX(0, j, dim)].blue = (unsigned short)((sum[RIDX(0, j, dim)].blue + sum[RIDX(1, j, dim)].blue)/num);
+		
+		for(i = 1; i < dim-1; i++){
+			num = sum[RIDX(i-1, j, dim)].num + sum[RIDX(i, j, dim)].num+ sum[RIDX(i+1, j, dim)].num;
+			dst[RIDX(i, j, dim)].red = (unsigned short)((sum[RIDX(i-1, j, dim)].red + sum[RIDX(i, j, dim)].red + sum[RIDX(i+1, j, dim)].red)/num);
+			dst[RIDX(i, j, dim)].green = (unsigned short)((sum[RIDX(i-1, j, dim)].green + sum[RIDX(i, j, dim)].green + sum[RIDX(i+1, j, dim)].green)/num);
+			dst[RIDX(i, j, dim)].blue = (unsigned short)((sum[RIDX(i-1, j, dim)].blue + sum[RIDX(i, j, dim)].blue + sum[RIDX(i+1, j, dim)].blue)/num);
+			}
+						
+		num = sum[RIDX(dim-1, j, dim)].num + sum[RIDX(dim-1, j, dim)].num;
+		dst[RIDX(dim-1, j, dim)].red = (unsigned short)((sum[RIDX(dim-1, j, dim)].red + sum[RIDX(dim-2, j, dim)].red)/num);
+		dst[RIDX(dim-1, j, dim)].green = (unsigned short)((sum[RIDX(dim-1, j, dim)].green + sum[RIDX(dim-2, j, dim)].green)/num) ;
+		dst[RIDX(dim-1, j, dim)].blue = (unsigned short)((sum[RIDX(dim-1, j, dim)].blue + sum[RIDX(dim-2, j, dim)].blue)/num) ;
+	}
+				
+}
+
+
+char smooth_descr9[] = "smooth9";
+void smooth9(int dim, pixel *src, pixel *dst)
+{
+    pixel_sum sum[530][513];
+    int i, j, num;
+    for(i=0;i<dim; i++)
+    {
+       sum[i][0].red = (src[RIDX(i, 0, dim)].red+src[RIDX(i, 1, dim)].red);
+       sum[i][0].blue = (src[RIDX(i, 0, dim)].blue+src[RIDX(i, 1,dim)].blue);
+       sum[i][0].green = (src[RIDX(i, 0, dim)].green+src[RIDX(i, 1,dim)].green);
+       sum[i][0].num = 2;
+       
+	   for(j=1;j<dim-1; j++)
+        {
+           sum[i][j].red = (src[RIDX(i, j-1, dim)].red+src[RIDX(i, j,dim)].red+src[RIDX(i, j+1, dim)].red);
+           sum[i][j].blue = (src[RIDX(i, j-1, dim)].blue+src[RIDX(i, j,dim)].blue+src[RIDX(i, j+1, dim)].blue);
+           sum[i][j].green = (src[RIDX(i, j-1, dim)].green+src[RIDX(i, j,dim)].green+src[RIDX(i, j+1, dim)].green);
+           sum[i][j].num = 3;
+        }
+       
+	   sum[i][dim-1].red = (src[RIDX(i, dim-2, dim)].red+src[RIDX(i, dim-1,dim)].red);
+       sum[i][dim-1].blue = (src[RIDX(i, dim-2, dim)].blue+src[RIDX(i,dim-1, dim)].blue);
+       sum[i][dim-1].green = (src[RIDX(i, dim-2, dim)].green+src[RIDX(i,dim-1, dim)].green);
+       sum[i][dim-1].num = 2;
+    }
+    for(j=0;j<dim; j++)
+    {
+        num =sum[0][j].num+sum[1][j].num;
+        dst[RIDX(0,j, dim)].red = (unsigned short)((sum[0][j].red+sum[1][j].red)/num);
+        dst[RIDX(0,j, dim)].blue = (unsigned short)((sum[0][j].blue+sum[1][j].blue)/num);
+        dst[RIDX(0,j, dim)].green = (unsigned short)((sum[0][j].green+sum[1][j].green)/num);
+        
+		for(i=1;i<dim-1; i++)
+        {
+           num =sum[i-1][j].num+sum[i][j].num+sum[i+1][j].num;
+           dst[RIDX(i, j, dim)].red = (unsigned short)((sum[i-1][j].red+sum[i][j].red+sum[i+1][j].red)/num);
+           dst[RIDX(i, j, dim)].blue = (unsigned short)((sum[i-1][j].blue+sum[i][j].blue+sum[i+1][j].blue)/num);
+           dst[RIDX(i, j, dim)].green = (unsigned short)((sum[i-1][j].green+sum[i][j].green+sum[i+1][j].green)/num);
+        }
+       
+	   num =sum[dim-1][j].num+sum[dim-2][j].num;
+       dst[RIDX(dim-1, j, dim)].red = (unsigned short)((sum[dim-2][j].red+sum[dim-1][j].red)/num);
+       dst[RIDX(dim-1, j, dim)].blue = (unsigned short)((sum[dim-2][j].blue+sum[dim-1][j].blue)/num);
+       dst[RIDX(dim-1, j, dim)].green = (unsigned short)((sum[dim-2][j].green+sum[dim-1][j].green)/num);
+    }
+}
 
 /********************************************************************* 
  * register_smooth_functions - Register all of your different versions
@@ -284,6 +486,9 @@ void smooth(int dim, pixel *src, pixel *dst)
 
 void register_smooth_functions() {
     add_smooth_function(&smooth, smooth_descr);
+	add_smooth_function(&smooth1, smooth_descr1);
+	add_smooth_function(&smooth5, smooth_descr5);
+	add_smooth_function(&smooth9, smooth_descr9);
     add_smooth_function(&naive_smooth, naive_smooth_descr);
     /* ... Register additional test functions here */
 }
