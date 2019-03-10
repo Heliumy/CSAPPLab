@@ -1,12 +1,12 @@
 #	CSAPP-Lab3：Bomb Lab
 
-姓名：龚***
+**姓名：**龚***
 
-学号：PB17***8
+**学号：**PB17***8
 
 ##	摘要
 
-本报告是对**计算机系统详解**课程课后实验----**CSAPP相关实验**的实验思路汇总以及心得体会报告。这次完成的实验是Bomb Lab，主要考察对几种常见的操作的x86汇编代码的了解程度和linux debug tool gdb的使用。
+本报告是对**计算机系统详解**课程课后实验----**CSAPP相关实验**的实验思路汇总以及心得体会报告。这次完成的实验是Bomb Lab，主要考察对几种常见的操作的**x86汇编代码**的了解程度和**linux debug tool gdb**的使用。
 
 ##	实验任务
 
@@ -42,9 +42,9 @@ objdump -D bomb > bomb.asm
   400efb:	c3                   	retq
 ```
 
-函数strings_not_equal是对两字符串进行比较，利用寄存器%edi，%esi来传递函数参数，并用%eax传递返回值。
+函数**strings_not_equal**是对两字符串进行比较，利用寄存器**%edi**，**%esi**来传递函数参数，并用**%eax**传递返回值。
 
-其中一个字符串首地址为0x402400，指向rodata section，其对应bytes为：
+其中一个字符串首地址为**0x402400**，指向**rodata section**，其对应bytes为：
 
 ```assembly
 42 6f 72 64 65 72 20 72 65 6c 61 74 69 6f 6e 73 20 77 69 74 68 20 43 61 6e 61 64 61 20 68 61 76 65 20 6e 65 76 65 72 20 62 65 65 6e 20 62 65 74 74 65 72 2e
@@ -87,7 +87,7 @@ Border relations with Canada have never been better.
   400f42:	c3                   	retq   
 ```
 
-由注释等信息易知，此函数输入六个integer，我们对函数内循环进行分析，可以发现每个数都是它直接前驱的两倍且第一个数是1
+由注释等信息易知，此函数输入**六个integer**，我们对函数内循环进行分析，可以发现**每个数都是它直接前驱的两倍**且第一个数是1
 
 所以对应的字符串为：
 
@@ -137,7 +137,7 @@ Border relations with Canada have never been better.
   400fcd:	c3                   	retq   
 ```
 
-phase_3函数中反复出现 jmp    400fbe <phase_3+0x7b> 指令，易判断这是一个C语言中的case语句。每个case都对应一个答案，共有8中情况：
+phase_3函数中反复出现 **jmp    400fbe <phase_3+0x7b>** 指令，易判断这是一个C语言中的case语句。每个case都对应一个答案，共有8中情况：
 
 ```assembly
 0 207
@@ -206,7 +206,7 @@ phase_3函数中反复出现 jmp    400fbe <phase_3+0x7b> 指令，易判断这�
 
 phase_4说实话没怎么看懂。主要是没有搞懂其调用的func4函数的功能。
 
-易判断输入的字符为两个integer，第一个integer小于15且第二个integer为0；还要求func4的返回值为0。对func4简单进行查看，但输入参数为0是返回0。
+易判断输入的字符为两个integer，**第一个integer小于15且第二个integer为0**；还要求func4的返回值为0。对func4简单进行查看，但输入参数为0是返回0。
 
 所以一个解为：
 
@@ -260,7 +260,7 @@ phase_4说实话没怎么看懂。主要是没有搞懂其调用的func4函数�
   4010f3:	c3                   	retq   
 ```
 
-phase_5是输入长度为6的一个字符串且存在字符比较。其中一个字符串对应的是“flyers”。
+phase_5是输入长度为6的一个字符串且存在字符比较。其中一个字符串对应的是**“flyers”**。
 
 输入字符安装先按照一个字符数组对应成一个新的字符，再将新字符与“flyers”进行比较。
 
@@ -270,7 +270,7 @@ phase_5是输入长度为6的一个字符串且存在字符比较。其中一个
 new char = char_array[old char $ 0xF]
 ```
 
-这个char_array一部分为：
+这个**char_array**一部分为：
 
 ```assembly
 61 64 75 69 6d 65 72 73 6e 66 6f 74 76 62 79 6c 53 6f 20  #16进制
