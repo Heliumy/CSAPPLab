@@ -1,8 +1,4 @@
-[TOC]
-
 #	Attack Lab
-
-​	本文档是我做CSAPP-Attack Lab的过程记录，不是正式的实验报告。
 
 ##	Code Injecting Attacks
 
